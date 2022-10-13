@@ -9,11 +9,13 @@ import TextPractice from '../../components/TextPractice';
 import TouchableOpacityPractice from '../../components/TouchableOpacityPractice';
 import UseEffectPractice from '../../components/useEffectPractice';
 import UseStatePractice from '../../components/useStatePractice';
+import TodoList from '../../components/todoList';
+import StyledExemple from '../../components/styledExemple';
 
 const Practice = () => {
   return (
     <SafeAreaView>
-      <UseEffectPractice />
+      <StyledExemple />
     </SafeAreaView>
   );
 };

@@ -1,9 +1,13 @@
 import React from 'react';
-import Home from './src/screens/home';
-import Practice from './src/screens/practice';
+
+import {SafeAreaView, Text} from 'react-native';
 
 const App = () => {
-  return <Practice />;
+  return (
+    <SafeAreaView>
+      <Text>Mettez ce que vous voulez ici</Text>
+    </SafeAreaView>
+  );
 };
 
 export default App;
