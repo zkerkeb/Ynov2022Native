@@ -1,9 +1,13 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
 const UseStatePractice = () => {
   const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    alert(`Vous avez cliqué ${count} fois`);
+  }, [count]);
 
   return (
     <View>
