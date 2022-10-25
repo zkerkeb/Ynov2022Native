@@ -1,14 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React from 'react';
-import {
-  SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Text, TextInput, View} from 'react-native';
 import {NavigationButton} from '../../components/button';
+import LoginForm from '../../components/loginForm';
 
 // on cree la page et on ne fait de rien de complexe
 // on verifie juste que sa fonctionne
@@ -19,11 +14,21 @@ import {NavigationButton} from '../../components/button';
 
 const Login = ({navigation}) => {
   // creation des variable necessaire au login avec les useState
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
+  // const [username, setUsername] = React.useState('');
+  // const [password, setPassword] = React.useState('');
+  // creation d'un state qui vas recupere toute les donnees quelque soit leur
+  // nombre
+  const [inputs, setInputs] = React.useState({
+    username: '',
+    password: '',
+  });
 
   // creation de la fonction qui vas envoyer les donnees a l'API
   const submitForm = () => {
+    //    ->const {username, password} = inputs: destructuration de inputs pour
+    // recuperer username et password en tant que variable separer
+    const {username, password} = inputs;
+
     axios({
       method: 'POST',
       url: 'https://easy-login-api.herokuapp.com/users/login',
@@ -55,13 +60,12 @@ const Login = ({navigation}) => {
         label="To characters"
       />
       {/* creation du formulaire (comme dans todolist)*/}
-      <View>
-        <Text>Username</Text>
-        <TextInput onChangeText={setUsername} value={username} />
-        <Text>Password</Text>
-        <TextInput onChangeText={setPassword} value={password} />
-      </View>
-      <NavigationButton label="SUBMIT" onPress={submitForm} />
+
+      <LoginForm
+        setInputs={setInputs}
+        submitForm={submitForm}
+        inputs={inputs}
+      />
     </View>
   );
 };

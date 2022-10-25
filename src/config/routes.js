@@ -5,6 +5,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {Dimensions} from 'react-native';
 import Login from '../screens/login';
 import Characters from '../screens/characters';
+import Character from '../screens/character';
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +27,7 @@ const Routes = () => {
         }}>
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Characters" component={Characters} />
+        <Stack.Screen name="Character" component={Character} />
       </Stack.Navigator>
     </NavigationContainer>
   );
