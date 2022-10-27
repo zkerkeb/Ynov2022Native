@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import {NavigationButton} from '../../components/button';
 import defaultImage from '../../assets/images/default.jpeg';
+import verifyIfUserIsConnected from '../../utils/verfiyIfUserIsConnected';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // const defaultImage =
 //   'https://mj-gallery.com/eb525a45-7776-47e5-9c79-ed9c995f3d0a/grid_0.png';
@@ -23,30 +25,86 @@ import defaultImage from '../../assets/images/default.jpeg';
 
 const Characters = ({navigation}) => {
   const [characters, setCharacters] = useState([]);
+  const [page, setPage] = useState(0);
+  const offset = 30;
+
+  useEffect(() => {
+    verifyIfUserIsConnected(navigation);
+  }, []);
 
   useEffect(() => {
     // facon differente de faire une requete API
     const getDatas = async () => {
       try {
-        const result = await axios.get(
-          'https://gateway.marvel.com/v1/public/characters?ts=1&apikey=3d4b10bbed8eee1e581e206b349e509c&hash=97b7858bc61f2402980b70c5bc13a86a&offset=0&limit=100',
-        );
+        const result = await axios({
+          method: 'GET',
+          url: 'https://gateway.marvel.com/v1/public/characters',
+          params: {
+            ts: 1,
+            apikey: '3d4b10bbed8eee1e581e206b349e509c',
+            hash: '97b7858bc61f2402980b70c5bc13a86a',
+            offset: offset * page, // si page = 0 => offset = 0 si page = 1 => offset = 30
+            limit: 30,
+          },
+        });
         // on recupere les valeur que l'on veut dans la reponse de l'API
-        setCharacters(result.data.data.results);
+        setCharacters([...characters, ...result.data.data.results]);
       } catch (error) {
         console.log(error);
       }
     };
     getDatas();
-  }, []);
+  }, [page]);
+
+  const disconnect = async () => {
+    await AsyncStorage.removeItem('token');
+    navigation.navigate('Login');
+  };
+
+  const isInFavorite = async character => {
+    const favoriteLocal = JSON.parse(await AsyncStorage.getItem('favorite'));
+    const exist = favoriteLocal.filter(fav => fav.id === character.id);
+    return exist.length > 0;
+  };
+
+  const AddOrRemoveToFavorite = async character => {
+    console.log(character);
+    const favorite =
+      (await AsyncStorage.getItem('favorite')) !== null
+        ? JSON.parse(await AsyncStorage.getItem('favorite'))
+        : [];
+    favorite.push(character);
+
+    const exist = await isInFavorite(character);
+    if (exist) {
+      const newFavorite = favorite.filter(fav => fav.id !== character.id);
+      await AsyncStorage.setItem('favorite', JSON.stringify(newFavorite));
+    } else {
+      await AsyncStorage.setItem('favorite', JSON.stringify(favorite));
+    }
+  };
+
+  const checkFavorite = async () => {
+    const favorite = AsyncStorage.getItem('favorite')
+      ? JSON.parse(await AsyncStorage.getItem('favorite'))
+      : [];
+    console.log(favorite);
+  };
 
   return (
     <View>
       <Text>Page Characters</Text>
+      <NavigationButton onPress={disconnect} label="Se deconnecter" />
       <NavigationButton
         onPress={() => navigation.navigate('Login')}
         label="To Login"
       />
+      <NavigationButton
+        onPress={() => navigation.navigate('Favorite')}
+        label="To Favorite"
+      />
+
+      <NavigationButton onPress={checkFavorite} label="CHECK Favorite" />
       {/* on parcours notre resultat de requete pour afficher les donnees une a une */}
       {/** on vas faire une FlatList a la place pour etre plus prerfomant */}
       {/**  -> data: les donnees qu'on a recuperer de l'API */}
@@ -61,20 +119,29 @@ const Characters = ({navigation}) => {
         keyExtractor={item => item.id}
         //   {/* permet d'executer une fonction quand on arrive au bout de la  */}
         //   {/**  flatList */}
-        onEndReached={() => console.log('end reached')}
-        renderItem={({item}) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Character', {id: item.id})}>
-            <Image
-              style={{width: 100, height: 100}}
-              source={defaultImage} // ignorer dans le debug
-              // source={{
-              //   uri: `${item.thumbnail.path}.${item.thumbnail.extension}`,
-              // }}
-            />
-            <Text>{item.name}</Text>
-          </TouchableOpacity>
-        )}
+        onEndReached={() => setPage(page + 1)}
+        renderItem={({item}) => {
+          return (
+            <>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Character', {id: item.id})}>
+                <Image
+                  style={{width: 100, height: 100}}
+                  // defaultSource={defaultImage} // ignorer dans le debug
+                  source={{
+                    uri: `${item.thumbnail.path}.${item.thumbnail.extension}`,
+                  }}
+                />
+                <Text>{item.name}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => AddOrRemoveToFavorite(item)}
+                style={{padding: 24}}>
+                <Text>Add To favorite</Text>
+              </TouchableOpacity>
+            </>
+          );
+        }}
       />
     </View>
   );

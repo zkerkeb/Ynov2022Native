@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import {NavigationButton} from '../../components/button';
 import LoginForm from '../../components/loginForm';
+import verifyIfUserIsConnected from '../../utils/verfiyIfUserIsConnected';
+import {useFocusEffect} from '@react-navigation/native';
 
 // on cree la page et on ne fait de rien de complexe
 // on verifie juste que sa fonctionne
@@ -21,6 +23,12 @@ const Login = ({navigation}) => {
   const [inputs, setInputs] = React.useState({
     username: '',
     password: '',
+  });
+
+  // se lance au focus d'une page
+  useFocusEffect(() => {
+    // navigation.navigate('Characters');
+    verifyIfUserIsConnected(navigation);
   });
 
   // creation de la fonction qui vas envoyer les donnees a l'API
@@ -44,6 +52,7 @@ const Login = ({navigation}) => {
         console.log(res);
         // on recupere le token place dans le header du resultat de la requete
         await AsyncStorage.setItem('token', res.headers['x-access-token']);
+        // await AsyncStorage.setItem('token', 'OUI OUI');
         // change la page pour acceder a la page 'Characters'
         navigation.navigate('Characters');
       })
