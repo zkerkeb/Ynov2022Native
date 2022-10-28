@@ -13,6 +13,7 @@ import {NavigationButton} from '../../components/button';
 import defaultImage from '../../assets/images/default.jpeg';
 import verifyIfUserIsConnected from '../../utils/verfiyIfUserIsConnected';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import getFavorite from '../../utils/getFavorite';
 
 // const defaultImage =
 //   'https://mj-gallery.com/eb525a45-7776-47e5-9c79-ed9c995f3d0a/grid_0.png';
@@ -61,35 +62,26 @@ const Characters = ({navigation}) => {
     navigation.navigate('Login');
   };
 
-  const isInFavorite = async character => {
-    const favoriteLocal = JSON.parse(await AsyncStorage.getItem('favorite'));
-    const exist = favoriteLocal.filter(fav => fav.id === character.id);
-    return exist.length > 0;
-  };
+  const isInFavorite = async character => {};
 
   const AddOrRemoveToFavorite = async character => {
-    console.log(character);
-    const favorite =
-      (await AsyncStorage.getItem('favorite')) !== null
-        ? JSON.parse(await AsyncStorage.getItem('favorite'))
-        : [];
-    favorite.push(character);
-
-    const exist = await isInFavorite(character);
-    if (exist) {
-      const newFavorite = favorite.filter(fav => fav.id !== character.id);
-      await AsyncStorage.setItem('favorite', JSON.stringify(newFavorite));
+    const localFavorite = await getFavorite();
+    console.log(localFavorite);
+    const index = localFavorite.findIndex(item => item.id === character.id);
+    console.log(index);
+    if (index === -1) {
+      localFavorite.push(character);
+      await AsyncStorage.setItem('favorite', JSON.stringify(localFavorite));
     } else {
-      await AsyncStorage.setItem('favorite', JSON.stringify(favorite));
+      localFavorite.splice(index, 1);
+      await AsyncStorage.setItem('favorite', JSON.stringify(localFavorite));
     }
   };
 
-  const checkFavorite = async () => {
-    const favorite = AsyncStorage.getItem('favorite')
-      ? JSON.parse(await AsyncStorage.getItem('favorite'))
-      : [];
-    console.log(favorite);
-  };
+  // const checkFavorite = async () => {
+  //   const favorite = JSON.parse(await AsyncStorage.getItem('favorite'));
+  //   console.log(favorite);
+  // };
 
   return (
     <View>
@@ -104,7 +96,7 @@ const Characters = ({navigation}) => {
         label="To Favorite"
       />
 
-      <NavigationButton onPress={checkFavorite} label="CHECK Favorite" />
+      {/* <NavigationButton onPress={checkFavorite} label="CHECK Favorite" /> */}
       {/* on parcours notre resultat de requete pour afficher les donnees une a une */}
       {/** on vas faire une FlatList a la place pour etre plus prerfomant */}
       {/**  -> data: les donnees qu'on a recuperer de l'API */}
@@ -129,8 +121,11 @@ const Characters = ({navigation}) => {
                   style={{width: 100, height: 100}}
                   // defaultSource={defaultImage} // ignorer dans le debug
                   source={{
-                    uri: `${item.thumbnail.path}.${item.thumbnail.extension}`,
+                    uri: 'https://s3.amazonaws.com/video-api-prod/assets/f313dd1bf578499ea1cfa804750283d5/SpicyMango.jpg',
                   }}
+                  // source={{
+                  //   uri: `${item.thumbnail.path}.${item.thumbnail.extension}`,
+                  // }}
                 />
                 <Text>{item.name}</Text>
               </TouchableOpacity>

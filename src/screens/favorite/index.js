@@ -4,38 +4,18 @@ import styled from 'styled-components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
+import getFavorite from '../../utils/getFavorite';
 
 const Favorite = () => {
   const [favorite, setFavorite] = useState([]);
 
-  // useFocusEffect(() => {
-  //   const getFavorite = async () => {
-  //     const favoriteLocal = (await AsyncStorage.getItem('favorite'))
-  //       ? JSON.parse(await AsyncStorage.getItem('favorite'))
-  //       : [];
-  //     console.log(favoriteLocal);
-  //     setFavorite(favoriteLocal);
-  //   };
-  //   getFavorite();
-  // });
-
-  useEffect(() => {
-    axios({
-      method: 'GET',
-      url: 'https://tasty.p.rapidapi.com/recipes/list',
-      params: {from: '0', size: '10'},
-      headers: {
-        'X-RapidAPI-Key': '2eb89bc3f1mshc34758fad5e37b3p17e518jsnd04e8741ce92',
-        'X-RapidAPI-Host': 'tasty.p.rapidapi.com',
-      },
-    })
-      .then(response => {
-        console.log(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
-  }, []);
+  useFocusEffect(() => {
+    const getLocalFavorite = async () => {
+      const favoriteLocal = await getFavorite();
+      setFavorite(favoriteLocal);
+    };
+    getLocalFavorite();
+  });
 
   return (
     <ScrollView>
