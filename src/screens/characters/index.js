@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import {NavigationButton} from '../../components/button';
-import defaultImage from '../../assets/images/default.jpeg';
+import CharacterRow from '../../components/characterRow';
 import verifyIfUserIsConnected from '../../utils/verfiyIfUserIsConnected';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import getFavorite from '../../utils/getFavorite';
@@ -111,32 +111,8 @@ const Characters = ({navigation}) => {
         keyExtractor={item => item.id}
         //   {/* permet d'executer une fonction quand on arrive au bout de la  */}
         //   {/**  flatList */}
-        onEndReached={() => setPage(page + 1)}
-        renderItem={({item}) => {
-          return (
-            <>
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Character', {id: item.id})}>
-                <Image
-                  style={{width: 100, height: 100}}
-                  // defaultSource={defaultImage} // ignorer dans le debug
-                  source={{
-                    uri: 'https://s3.amazonaws.com/video-api-prod/assets/f313dd1bf578499ea1cfa804750283d5/SpicyMango.jpg',
-                  }}
-                  // source={{
-                  //   uri: `${item.thumbnail.path}.${item.thumbnail.extension}`,
-                  // }}
-                />
-                <Text>{item.name}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => AddOrRemoveToFavorite(item)}
-                style={{padding: 24}}>
-                <Text>Add To favorite</Text>
-              </TouchableOpacity>
-            </>
-          );
-        }}
+        onEndReached={() => console.log('end reached')}
+        renderItem={({item}) => <CharacterRow item={item} />}
       />
     </View>
   );

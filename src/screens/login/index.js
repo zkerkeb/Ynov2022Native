@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, {useEffect} from 'react';
 import {Text, TextInput, View} from 'react-native';
+import AnimationExample from '../../components/animationExemple';
 import {NavigationButton} from '../../components/button';
 import LoginForm from '../../components/loginForm';
 import verifyIfUserIsConnected from '../../utils/verfiyIfUserIsConnected';
@@ -75,6 +76,7 @@ const Login = ({navigation}) => {
         submitForm={submitForm}
         inputs={inputs}
       />
+      <AnimationExample />
     </View>
   );
 };
